@@ -12,19 +12,13 @@
 - git submodule add https://github.com/anshily/go-ipfs.git go-ipfs 
 添加子模块到本仓库 git submodule add <url> <path>（url为仓库地址，path为该子模块存储的目录路径）
 
+### 描述
 
-除此之外B+树还有以下的要求。
+	项目起源于笔者的一个 idea ———— 数据上链，因此需要一个去中心化的存储系统，最终选型 ipfs 但是 ipfs 上数据的索引为 hash 不方便记忆和传播，而平常项目里的数据库提供了便捷的数据存储操作，于是诞生了自己写一个简单的数据库的想法。
 
-1）B+树包含2种类型的结点：内部结点（也称索引结点）和叶子结点。根结点本身即可以是内部结点，也可以是叶子结点。根结点的关键字个数最少可以只有1个。
-
-2）B+树与B树最大的不同是内部结点不保存数据，只用于索引，所有数据（或者说记录）都保存在叶子结点中。
-
-3） m阶B+树表示了内部结点最多有m-1个关键字（或者说内部结点最多有m个子树），阶数m同时限制了叶子结点最多存储m-1个记录。
-
-4）内部结点中的key都按照从小到大的顺序排列，对于内部结点中的一个key，左树中的所有key都小于它，右子树中的key都大于等于它。叶子结点中的记录也按照key的大小排列。
-
-5）每个叶子结点都存有相邻叶子结点的指针，叶子结点本身依关键字的大小自小而大顺序链接。
-
+###### 技术选型
+  基于ipfs的 hash 为定长数据 因此选择 b-tree 建立hash的索引就可以实现一个基本的数据库索引
+  检索了很多 b-tree 的文章 这里将自己的一些心得给记录下来 
 
 ### 数据结构
 
@@ -60,4 +54,7 @@
 
 
 ### 引用
-[B树和B+树的插入、删除图文详解](https://www.cnblogs.com/nullzx/p/8729425.html)
+- [B树和B+树的插入、删除图文详解](https://www.cnblogs.com/nullzx/p/8729425.html)
+- [数据结构与算法：B树（B-Tree）定义及搜索、插入、删除基本操作](https://blog.csdn.net/u014165620/article/details/82976882)
+- [从 MongoDB 及 Mysql 谈B/B+树](https://blog.csdn.net/wwh578867817/article/details/50493940)
+- [btree 可视化](https://www.cs.usfca.edu/~galles/visualization/BTree.html)

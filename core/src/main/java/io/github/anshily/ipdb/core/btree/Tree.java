@@ -1,5 +1,8 @@
 package io.github.anshily.ipdb.core.btree;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import static io.github.anshily.ipdb.core.base.Constants.MINMUM_DEGREE;
@@ -17,18 +20,13 @@ public class Tree {
         this.rid = 0;
         this.storeBase = new ArrayList<Node>();
         Node node = new Node();
-        this.storeBase.add(node.nodeId, node);
+        updataBaseStroe(node);
     }
 
     /**
      * 每个叶结点包含的关键字个数有上界和下界。用一个被称为B树的最小度数（minmum degree）的固定整数 t >= 2 来表示这个界：
      * a. 除根节点以外的每个内部节点至少有 t 个孩子，除根节点以外的每个结点至少有 t-1 个关键字。如果树非空，根结点至少有一个关键字。
      * b. 每个内部结点最多有 2t 个孩子， 最多有 2t-1 个关键字。如果一个节点恰好有 2t-1 个关键字，则称该结点是满的（full）。
-     * ---------------------
-     * 作者：F小二V
-     * 来源：CSDN
-     * 原文：https://blog.csdn.net/u014165620/article/details/82976882
-     * 版权声明：本文为博主原创文章，转载请附上博文链接！
      */
 
     // 0  0  1  1      i-1 i-1   n-2  n-2  n-1
@@ -39,7 +37,7 @@ public class Tree {
         /**
          * 第i个孩子 索引为 i-1
          */
-        Node y = storeBase.get(x.c.get(i));
+        Node y = storeBase.get(x.child.get(i));
         Node z = allocateNode();
         z.leaf = y.leaf;
         z.n = t - 1;
@@ -55,6 +53,9 @@ public class Tree {
                 z.key.add(j,y.key.get(j+t));
             }
             y.key.remove(j+t);
+            if (!y.leaf){
+                y.child.remove(j+t+1);
+            }
         }
         y.n = t - 1;
 
@@ -63,21 +64,39 @@ public class Tree {
          * 指针 2t 个 将索引从 i 到 2t-1 的指针后移
          */
         for (int j = x.n-1; i < j; j--) {
-            if (x.c.size() > j+1){
-                x.c.set(j+1,x.c.get(j));
+            if (x.child.size() > j+1){
+                x.child.set(j+1,x.child.get(j));
             }else {
-                x.c.add(j+1,x.c.get(j));
+                x.child.add(j+1,x.child.get(j));
             }
-
         }
         //x的第 i 个孩子为原节点 第（i+1）个孩子为新结点z
-        if (x.c.size() > i+1){
-            x.c.set(i+1, z.nodeId);
+        if (x.child.size() > i+1){
+            x.child.set(i+1, z.nodeId);
         }else {
-            x.c.add(i+1, z.nodeId);
+            x.child.add(i+1, z.nodeId);
         }
 
-        //将x中i后面的所有关键字向后移一位
+        //将x中i后面的所有关键字向后移一位 ！！！！此时 x 应判断 x 节点是否已满
+        // 满则分裂
+        if (isFull(x)){
+            if (x.nodeId == rid){
+                Node s = allocateNode();
+                rid = s.nodeId;
+                s.leaf = false;
+                s.n = 0;
+
+                if (s.child.size() > 0){
+                    s.child.set(0, x.nodeId);
+                }else {
+                    s.child.add(0, x.nodeId);
+                }
+                updataBaseStroe(s);
+                splitChild(s, 0);
+            }else {
+
+            }
+        }
 
         for (int j = x.n-1; i <= j; j--) {
             if (x.key.size() > j+1){
@@ -94,26 +113,18 @@ public class Tree {
             x.key.add(i,y.key.get(t-1));
         }
         y.key.remove(t-1);
+        if (!y.leaf){
+            y.child.remove(t);
+        }
         x.n = x.n + 1;
-        if (storeBase.size() > x.nodeId){
-            storeBase.set(x.nodeId, x);
-        }else {
-            storeBase.add(x.nodeId, x);
-        }
-        if (storeBase.size() > y.nodeId){
-            storeBase.set(y.nodeId, y);
-        }else {
-            storeBase.add(y.nodeId, y);
-        }
-        if (storeBase.size() > z.nodeId){
-            storeBase.set(z.nodeId, z);
-        }else {
-            storeBase.add(z.nodeId, z);
-        }
+
+        updataBaseStroe(x);
+        updataBaseStroe(y);
+        updataBaseStroe(z);
     }
 
     //在B树T中插入关键字k
-    public void insertData(int k) {
+    public void insertData(Data k) {
         Node r = storeBase.get(rid);
         //如果根结点r是满的，需要向上新提一个根结点
         if (r.n == 2*t - 1) {
@@ -122,10 +133,10 @@ public class Tree {
             s.leaf = false;
             s.n = 0;
 
-            if (s.c.size() > 0){
-                s.c.set(0, r.nodeId);
+            if (s.child.size() > 0){
+                s.child.set(0, r.nodeId);
             }else {
-                s.c.add(0, r.nodeId);
+                s.child.add(0, r.nodeId);
             }
             updataBaseStroe(s);
             splitChild(s, 0);
@@ -138,7 +149,7 @@ public class Tree {
     }
 
     //向以非满结点x为根的树中插入关键字k
-    public void insertNonFull(Node x, int k) {
+    public void insertNonFull(Node x, Data k) {
         x = storeBase.get(x.nodeId);
         int i = x.n;
         //叶结点，直接在该结点插入
@@ -146,9 +157,9 @@ public class Tree {
 
             boolean eq = false;
 
-            while (i >= 1 && k <= x.key.get(i-1)) {
+            while (i >= 1 && (k.keyLt(x.key.get(i-1)) || k.keyEq(x.key.get(i-1)))) {
 
-                if (k != x.key.get(i-1)){
+                if (!k.keyEq(x.key.get(i-1))){
                     if (x.key.size() > i){
                         x.key.set(i, x.key.get(i-1));
                     }else {
@@ -168,26 +179,24 @@ public class Tree {
             if (!eq){
                 x.n = x.n + 1;
             }
-            if (storeBase.size() > x.nodeId){
-                storeBase.set(x.nodeId, x);
-            }else {
-                storeBase.add(x.nodeId, x);
-            }
+
+            updataBaseStroe(x);
         }
         //内部结点，需要找到插入的叶结点位置
         else {
-            while (i >= 1 && k < x.key.get(i-1)) {
+            while (i >= 1 && k.keyLt(x.key.get(i-1))) {
                 i = i - 1;
             }
 //            storeBase.get(x.c.get(i));
-            Node node = storeBase.get(x.c.get(i));
+            Node node = storeBase.get(x.child.get(i));
             if (isFull(node)) {
                 splitChild(x, i);
-                if (k > x.key.get(i)) {
+
+                if (k.keyGt(x.key.get(i))) {
                     i = i + 1;
                 }
             }
-            insertNonFull(storeBase.get(x.c.get(i)), k);
+            insertNonFull(storeBase.get(x.child.get(i)), k);
         }
     }
 
@@ -204,10 +213,34 @@ public class Tree {
     }
 
     public void updataBaseStroe(Node node){
-        if (node.key.size() > node.nodeId){
+        if (storeBase.size() > node.nodeId){
             this.storeBase.set(node.nodeId, node);
         }else {
             this.storeBase.add(node.nodeId, node);
+        }
+    }
+
+    public ArrayList<Node> getStoreBase() {
+        return storeBase;
+    }
+
+    public void setStoreBase(ArrayList<Node> storeBase) {
+        this.storeBase = storeBase;
+    }
+
+    public void count(){
+        byte[] bytes = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(this.storeBase);
+            oos.flush();
+            bytes = bos.toByteArray ();
+            System.out.println(bytes.length);
+            oos.close();
+            bos.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }
