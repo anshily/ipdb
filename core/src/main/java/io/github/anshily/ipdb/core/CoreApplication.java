@@ -19,11 +19,11 @@ public class CoreApplication {
 		return client;
 	}
 
-	@Bean(name = "ipfsClient")
-	public IPFS ipfs(){
-		IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
-		return ipfs;
-	}
+//	@Bean(name = "ipfsClient")
+//	public IPFS ipfs(){
+//		IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
+//		return ipfs;
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(CoreApplication.class, args);

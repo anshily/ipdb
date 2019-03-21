@@ -14,27 +14,27 @@ public class IPFSController {
     @Autowired
     IPFServe ipfServe;
 
-    @GetMapping("/add")
-    public String add(String data){
-        String ret;
-        try {
-            ret = ipfServe.add(data);
-        } catch (IOException e) {
-            ret = "error";
-            e.printStackTrace();
-        }
-        return ret;
-    }
-
-    @GetMapping("/cat")
-    public String cat(String hash){
-        String ret;
-        try {
-            ret = ipfServe.cat(hash);
-        } catch (IOException e) {
-            e.printStackTrace();
-            ret = "error";
-        }
-        return ret;
-    }
+//    @GetMapping("/add")
+//    public String add(String data){
+//        String ret;
+//        try {
+//            ret = ipfServe.add(data);
+//        } catch (IOException e) {
+//            ret = "error";
+//            e.printStackTrace();
+//        }
+//        return ret;
+//    }
+//
+//    @GetMapping("/cat")
+//    public String cat(String hash){
+//        String ret;
+//        try {
+//            ret = ipfServe.cat(hash);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            ret = "error";
+//        }
+//        return ret;
+//    }
 }
