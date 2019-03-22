@@ -52,4 +52,52 @@ public class Node implements Serializable {
             this.child.add(i, c);
         }
     }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    public boolean isLeaf() {
+        return leaf;
+    }
+
+    public void setLeaf(boolean leaf) {
+        this.leaf = leaf;
+    }
+
+    public ArrayList<Data> getKey() {
+        return key;
+    }
+
+    public void setKey(ArrayList<Data> key) {
+        this.key = key;
+    }
+
+    public ArrayList<Integer> getChild() {
+        return child;
+    }
+
+    public void setChild(ArrayList<Integer> child) {
+        this.child = child;
+    }
 }

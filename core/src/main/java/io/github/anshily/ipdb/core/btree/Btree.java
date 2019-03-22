@@ -1,5 +1,9 @@
 package io.github.anshily.ipdb.core.btree;
 
+import io.github.anshily.ipdb.core.util.StoreHelper;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static io.github.anshily.ipdb.core.base.Constants.MINMUM_DEGREE;
@@ -497,6 +501,34 @@ public class Btree {
         System.out.println();
         for (int i = 0; i < node.child.size(); i++) {
             bfs(this.storeBase.get(node.child.get(i)));
+        }
+    }
+
+    public void printUnser(){
+        StoreChain.stroe(this.storeBase);
+
+        ArrayList<Node> nodes = StoreChain.cat();
+
+        bfs(nodes.get(rid));
+
+
+    }
+
+    public void printJSONleng(){
+        try {
+            StoreHelper storeHelper = new StoreHelper(this.storeBase,"obj.json");
+
+            storeHelper.store();
+
+            String string = storeHelper.cat();
+
+            System.out.println(string);
+
+            System.out.println(string.length());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

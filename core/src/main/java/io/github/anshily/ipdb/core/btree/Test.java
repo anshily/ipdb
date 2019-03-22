@@ -2,15 +2,11 @@ package io.github.anshily.ipdb.core.btree;
 
 import io.github.anshily.ipdb.core.util.StoreHelper;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-
 public class Test {
 
     public static void main(String[] args){
         Btree btree = new Btree();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 200; i++) {
             btree.insert(new Data(i,"test"+i));
 
             System.out.println("---------------------");
@@ -22,6 +18,14 @@ public class Test {
 
             btree.printTree();
         }
+
+        btree.printJSONleng();
+
+        System.out.println("uuuuuuuuuuuuuuuuuu");
+        System.out.println();
+        System.out.println();
+
+        btree.printUnser();
 
 //        Tree tree = new Tree();
 //        tree.insertData(new Data(10,"10test"));

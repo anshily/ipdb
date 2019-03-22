@@ -40,4 +40,24 @@ public class Data implements Key<Data>, Value<String>, Serializable {
     public boolean keyLt(Data key) {
         return this.key < key.key;
     }
+
+    public Integer getKey() {
+        return key;
+    }
+
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Boolean getIsnull() {
+        return isnull;
+    }
+
+    public void setIsnull(Boolean isnull) {
+        this.isnull = isnull;
+    }
 }
